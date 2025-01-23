@@ -21,7 +21,7 @@ module.exports = {
       port,
       tls,
       responseKey,
-      searchCriteria = { seen: true },
+      searchCriteria = { seen: false },
       fetchOptions = { envelope: true, source: true },
       download_attachments = false,
     } = modelParameters;
@@ -54,7 +54,7 @@ module.exports = {
 
         const emailIds = await client.search(searchCriteria);
         console.log(`Mensagens encontradas: ${emailIds.length}`);
-
+        console.log(searchCriteria);
         if (emailIds.length === 0) {
           console.log("Nenhuma mensagem encontrada com os critérios fornecidos.");
           return {
@@ -97,6 +97,8 @@ module.exports = {
             }
 
             messages.push(messageData);
+            
+            //await client.messageFlagsAdd(message.uid, ['\\Seen']);
           } catch (parseError) {
             console.error("Erro ao analisar a mensagem:", parseError);
           }

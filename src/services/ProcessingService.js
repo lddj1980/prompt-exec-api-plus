@@ -230,33 +230,46 @@ module.exports = {
   },
 
   replacePlaceholders(content, substituicoes) {
-    if (!content) return null;
+  if (!content) return null;
 
-    return content.replace(/\{\{(.*?)\}\}/g, (_, key) => {
-      const placeholder = key.trim();
+  // Função recursiva para resolver placeholders aninhados
+  const resolvePlaceholder = (placeholder) => {
+    // Verifica se é uma chamada de função (e.g., `now('DD-MM-YYYY HH:mm:ss')`)
+    const functionMatch = placeholder.match(/^(\w+)\((.*)\)$/);
+    if (functionMatch) {
+      const functionName = functionMatch[1];
+      const argsString = functionMatch[2];
 
-      // Verifica se é uma chamada de função (e.g., `now('DD-MM-YYYY HH:mm:ss')`)
-      const functionMatch = placeholder.match(/^(\w+)\((.*)\)$/);
-      if (functionMatch) {
-        const functionName = functionMatch[1];
-        const args = functionMatch[2]
-          .split(",")
-          .map((arg) => arg.trim().replace(/^['"]|['"]$/g, "")); // Remove aspas de strings
+      // Resolve os argumentos recursivamente
+      const args = argsString
+        .split(",")
+        .map((arg) => {
+          const trimmedArg = arg.trim();
+          // Se o argumento for um placeholder ou outra função, resolve recursivamente
+          if (trimmedArg.startsWith("{{") && trimmedArg.endsWith("}}")) {
+            return resolvePlaceholder(trimmedArg.slice(2, -2).trim());
+          }
+          return trimmedArg.replace(/^['"]|['"]$/g, ""); // Remove aspas de strings
+        });
 
-        // Executa a função correspondente
-        return this.executeFunctionPlaceholder(functionName, args) || "";
-      }
+      // Executa a função correspondente
+      return this.executeFunctionPlaceholder(functionName, args) || "";
+    }
 
-      const value = substituicoes[placeholder];
-      if (
-        Array.isArray(value) ||
-        (typeof value === "object" && value !== null)
-      ) {
-        return JSON.stringify(value);
-      }
-      return value || "";
-    });
-  },
+    // Se não for uma função, busca no objeto de substituições
+    const value = substituicoes[placeholder];
+    if (Array.isArray(value) || (typeof value === "object" && value !== null)) {
+      return JSON.stringify(value);
+    }
+    return value || "";
+  };
+
+  // Substitui todos os placeholders no conteúdo
+  return content.replace(/\{\{(.*?)\}\}/g, (_, key) => {
+    const placeholder = key.trim();
+    return resolvePlaceholder(placeholder);
+  });
+},
 
   replacePlaceholdersInJson(json, substituicoes) {
     if (Array.isArray(json)) {
@@ -279,7 +292,8 @@ module.exports = {
   executeFunctionPlaceholder(functionName, args) {
     const functionMap = {
       now: this.now,
-      html_data: this.html_data, // Nova função adicionada
+      html_data: this.html_data,
+      adjustDate: this.adjustDate, // Nova função adicionada
     };
 
     if (functionMap[functionName]) {
@@ -307,5 +321,20 @@ module.exports = {
       console.error(`Erro ao acessar a URL ${url}:`, error);
       return null;
     }
+  },
+
+  // Nova função para ajustar datas
+  adjustDate(date, days, format = "YYYY-MM-DD") {
+    // Verifica se a data é válida
+    if (!date || !moment(date).isValid()) {
+      console.error("Data inválida fornecida.");
+      return null;
+    }
+
+    // Adiciona ou subtrai os dias
+    const adjustedDate = moment(date).add(days, 'days');
+
+    // Retorna a data no formato especificado
+    return adjustedDate.format(format);
   },
 };
