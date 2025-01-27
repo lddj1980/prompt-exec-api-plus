@@ -116,7 +116,7 @@ module.exports = {
         [responseKey]: {
           success: false,
           error: error.message,
-          details: error.response?.data || null,
+          details: error.response?.data || null,//
         },
       };
     }

@@ -1,6 +1,7 @@
 const moment = require("moment"); // Biblioteca para manipulação de datas
 const axios = require("axios"); // Biblioteca para fazer requisições HTTP
 const { parse } = require("node-html-parser");
+const { JSDOM } = require("jsdom"); // Biblioteca para parsing avançado de HTML
 
 const SolicitacaoRepository = require("../data/SolicitacaoRepository");
 const PromptRepository = require("../data/PromptRepository");
@@ -294,6 +295,7 @@ module.exports = {
       now: this.now,
       html_data: this.html_data,
       adjustDate: this.adjustDate, // Nova função adicionada
+      extractTextLinksAndImages: this.extractTextLinksAndImages, // New function added
     };
 
     if (functionMap[functionName]) {
@@ -318,7 +320,77 @@ module.exports = {
       const root = parse(html);
       return root.text; // Retorna o texto extraído do HTML
     } catch (error) {
-      console.error(`Erro ao acessar a URL ${url}:`, error);
+      console.error(`Erro ao acessar a URL ${url}:`, error);//
+      return null;
+    }
+  },
+  
+   /**
+   * Fetch and extract plain text, links, and images from a given HTML URL.
+   * @param {string} url - URL of the HTML page.
+   * @param {string} imageSelector - CSS selector for images (default: "img").
+   * @param {string} imageSrc - Attribute name for the image source (default: "src").
+   * @returns {Promise<Object|null>} - Object containing textContent, links, and images, or null in case of error.
+   */
+  async extractTextLinksAndImages(url, imgSelector) {
+    try {
+      console.log('url:', url);
+      const response = await axios.get(url);
+      const html = response.data;
+
+      // Use JSDOM to parse the HTML
+      const dom = new JSDOM(html);
+      const document = dom.window.document;
+
+      // Extract plain text (excluding hidden elements like <script>, <style>, etc.)
+      const textContent = Array.from(document.body.childNodes)
+        .map((node) => node.textContent.trim())
+        .filter((text) => text)
+        .join(" ")
+        .replace(/[\n\t]/g, " "); // Remove \n and \t, replacing with space
+
+      // Extract links
+      const links = Array.from(document.querySelectorAll("a"))
+        .map((a) => ({
+          text: a.textContent.trim().replace(/[\n\t]/g, " "), // Remove \n and \t from link text
+          href: a.href,
+        }))
+        .filter((link) => link.href); // Only keep valid links
+
+      // Extract images based on the optional selector and dynamic imageSrc
+      const images = Array.from(document.querySelectorAll(imgSelector.selector)).map((img) => {
+        const content = img.getAttribute(imgSelector.src || 'src');
+        console.log(content);
+        // Safely access the image source attribute dynamically
+        const filter = imgSelector.includes;
+        const ignore = imgSelector.excludes;
+        if (filter && filter.type && filter.args && content){
+           const argsIncludes = filter.args;
+           const testIncludes = eval(`content.${filter.type}(${argsIncludes})`);
+           if (testIncludes){
+           
+             if (ignore && ignore.type && ignore.args){
+               const argsExcludes = ignore.args;
+               const testIgnore = eval(`content.${ignore.type}(${argsExcludes})`);
+               if (!testIgnore){
+                 return content;
+               }
+             } else {
+               return content;
+             }
+           }
+        } else {
+          return content;
+        }
+      }).filter((src) => src); // Filter out null or undefined values
+
+      return {
+        textContent,
+        links,
+        images,
+      };
+    } catch (error) {
+      console.error(`Error accessing URL ${url}:`, error.message);
       return null;
     }
   },

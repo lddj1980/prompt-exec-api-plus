@@ -70,6 +70,10 @@ const MimicMotionIntegration = require('../engines/MimicMotionIntegration');
 const AudioFrequencyAdjustmentIntegration = require("../engines/AudioFrequencyAdjustmentIntegration");
 const FfmpegCommandIntegration = require("../engines/FfmpegCommandIntegration");
 const YoutubeDownloadIntegration = require("../engines/YoutubeDownloadIntegration");
+const AudioIsolationIntegration = require('../engines/AudioIsolationIntegration');
+const MusifyConvertVoicesIntegration = require('../engines/MusifyConvertVoicesIntegration');
+
+
 
 module.exports = {
   async processPrompt(prompt, engine, model, parametrosModelo) {
@@ -85,6 +89,9 @@ module.exports = {
         case "audio-frequency-adjustment":
           integrationClass = AudioFrequencyAdjustmentIntegration;
           break;          
+        case "audio-isolation":
+          integrationClass = AudioIsolationIntegration;
+          break;
         case 'automatic-mask-generator':
           integrationClass = AutomaticMaskGeneratorIntegration;
           break;
@@ -196,6 +203,9 @@ module.exports = {
         case 'music-generation-piapi':
           integrationClass = MusicGenerationPiapiIntegration;
           break;
+        case 'musify-convert-voices':
+          integrationClass = MusifyConvertVoicesIntegration;
+          break;          
         case 'mysql':
           integrationClass = MysqlIntegration;
           break;    

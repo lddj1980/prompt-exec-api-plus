@@ -78,7 +78,7 @@ module.exports = {
           const readableStream = Readable.from(buffer); // Cria um stream a partir do Buffer
 
           console.log("Uploading plain text content to FTP...");
-          await client.uploadFrom(readableStream, `${fullTargetPath}/${fileName}`);
+          await client.uploadFrom(readableStream, `${fullTargetPath}/${fileName}`);//
       }
 
       // Close the FTP connection

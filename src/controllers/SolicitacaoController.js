@@ -49,6 +49,24 @@ module.exports = {
  *                       properties:
  *                         engine:
  *                           type: string
+ *                           enum: ["musify-convert-voices"]
+ *                           description: Engine for the Convert Voice API integration
+ *                         model_parameters:
+ *                           $ref: '#/components/schemas/MusifyConvertVoiceParameters'
+ *                       required: [engine, model_parameters] 
+ *                     - type: object
+ *                       properties:
+ *                         engine:
+ *                           type: string
+ *                           enum: ["audio-isolation"]
+ *                           description: Engine for the Audio Isolation API integration
+ *                         model_parameters:
+ *                           $ref: '#/components/schemas/AudioIsolationParameters'
+ *                       required: [engine, model_parameters] 
+ *                     - type: object
+ *                       properties:
+ *                         engine:
+ *                           type: string
  *                           enum: ["youtube-video-download"]
  *                           description: Engine for the YouTube video download integration
  *                         model_parameters:

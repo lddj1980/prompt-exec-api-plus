@@ -1,6 +1,16 @@
 const axios = require('axios');
 
+function isValidJSON(str) {
+      try {
+          JSON.parse(str); // Tenta converter a string em um objeto JSON
+          return true; // Se não houver erro, é um JSON válido
+      } catch (e) {
+          return false; // Se ocorrer um erro, não é um JSON válido
+      }
+}
+
 module.exports = {
+  
   /**
    * Processa uma requisição para a API genérica.
    * @param {string} prompt - Dados ou informações principais para a requisição.
@@ -21,7 +31,7 @@ module.exports = {
       const responseKey = modelParameters.responseKey || 'response';
 
       if (!baseURL || !endpoint || !method) {
-        throw new Error('Os parâmetros "base_url", "endpoint" e "method" são obrigatórios.');
+        throw new Error('Os parâmetros "base_url", "endpoint" e "method" são obrigatórios.');//
       }
 
       // Configuração da requisição
@@ -29,8 +39,9 @@ module.exports = {
       const headers = modelParameters.headers || {};
       const timeout = modelParameters.timeout || 30000; // Timeout padrão de 5 segundos
       const params = modelParameters.params || {}; // Parâmetros de query opcionais
-      const data = modelParameters.body || {}; // Corpo da requisição
+      const data = isValidJSON(modelParameters.body) ? JSON.parse(modelParameters.body) : modelParameters.body || {}; // Corpo da requisição
 
+      console.log(data);
       // Executa a requisição diretamente com axios
       const response = await axios({
         method: method.toLowerCase(),
@@ -38,7 +49,7 @@ module.exports = {
         headers: headers,
         timeout: timeout,
         params: params,
-        data: data,
+        data:data,
       });
 
       console.log('Resposta recebida com sucesso:', response.data);

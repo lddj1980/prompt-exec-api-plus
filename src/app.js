@@ -20,6 +20,87 @@ const swaggerOptions = {
     },
     components: {
       schemas: {
+      "MusifyConvertVoiceParameters": {
+        "type": "object",
+        "description": "Parameters for the Convert Voice API integration.",
+        "properties": {
+          "audio_url": {
+            "type": "string",
+            "description": "URL of the input audio file.",
+            "example": "https://example.com/audio_file.mp3"
+          },
+          "api_key": {
+            "type": "string",
+            "description": "The API key for authentication with the Musicfy API.",
+            "example": "your_api_key_here"
+          },
+          "pitch_shift": {
+            "type": "string",
+            "description": "Pitch shift value for the audio conversion.",
+            "default": "0",
+            "example": "2"
+          },
+          "formant_shift": {
+            "type": "string",
+            "description": "Formant shift value for the audio conversion.",
+            "default": "1",
+            "example": "1.1"
+          },
+          "isolate_vocals": {
+            "type": "string",
+            "description": "Boolean value to isolate vocals.",
+            "default": "true",
+            "example": "true"
+          },
+          "background_pitch_shift": {
+            "type": "string",
+            "description": "Pitch shift value for the background audio.",
+            "default": "0",
+            "example": "-2"
+          },
+          "background_formant_shift": {
+            "type": "string",
+            "description": "Formant shift value for the background audio.",
+            "default": "1",
+            "example": "1.2"
+          },
+          "voice_id": {
+            "type": "string",
+            "description": "ID of the voice to be applied.",
+            "example": "c06b8712-2854-4170-b6f5-11b28817d8b3"
+          },
+          "responseKey": {
+            "type": "string",
+            "description": "The key for the response structure.",
+            "default": "convertVoiceResult",
+            "example": "convertVoiceResult"
+          }
+        },
+        "required": ["audio_url", "voice_id"]
+      },        
+     "AudioIsolationParameters": {
+        "type": "object",
+        "description": "Parameters for the Audio Isolation API integration.",
+        "properties": {
+          "audio_url": {
+            "type": "string",
+            "description": "The URL of the audio file to be processed.",
+            "example": "https://example.com/audio_file.wav"
+          },
+          "api_key": {
+            "type": "string",
+            "description": "The API key for authentication with the ElevenLabs API.",
+            "example": "your_api_key_here"
+          },
+          "responseKey": {
+            "type": "string",
+            "description": "The key for the response structure.",
+            "example": "audioIsolationResult",
+            "default": "audioIsolationResult"
+          }
+        },
+        "required": ["audio_url"]
+      },        
       "YoutubeDownloadParameters": {
           "type": "object",
           "description": "Parameters for the YouTube video download integration.",
