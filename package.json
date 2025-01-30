@@ -32,7 +32,9 @@
     "jsdom": "^16.7.0",
     "cors": "^2.8.5",
     "replicate": "^1.0.1",
-    "ytdl-core": "^4.11.5"
+    "ytdl-core": "^4.11.5",
+    "socks-proxy-agent": "^7.0.0",
+    "dotenv": "^16.0.3"
   },
   "engines": {
     "node": "14.x"

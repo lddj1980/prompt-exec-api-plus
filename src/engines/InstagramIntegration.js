@@ -21,7 +21,6 @@ module.exports = {
 
       let result;
 
-      console.log(modelParameters);
       // Decide qual funcionalidade usar com base nos parâmetros
       if (modelParameters.action === 'publishPost') {
         // Publica um post no Instagram
@@ -32,6 +31,7 @@ module.exports = {
 
         result = await instagramService.publishPost(
           modelParameters.media_url,
+          modelParameters.media_type || "IMAGE",
           modelParameters.caption || '',
           apiKey
         );

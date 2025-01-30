@@ -9,6 +9,8 @@ const pool = require('./config/database');
 const dbRepository = new DatabaseRepository(pool);
 const tableCleanerService = new TableCleanerService(dbRepository);
 const cors = require('cors'); // Importe o pacote cors
+const axios = require("axios");
+
 // Configuração do Swagger
 const swaggerOptions = {
   definition: {
@@ -20,6 +22,57 @@ const swaggerOptions = {
     },
     components: {
       schemas: {
+        "MVSEPParameters": {
+            "type": "object",
+            "description": "Parameters for the MVSEP API integration.",
+            "properties": {
+              "audio_url": {
+                "type": "string",
+                "description": "URL of the input audio file.",
+                "example": "https://example.com/audio_file.mp3"
+              },
+              "api_token": {
+                "type": "string",
+                "description": "The API key for authentication with the MVSEP API.",
+                "example": "your_api_token_here"
+              },
+              "sep_type": {
+                "type": "string",
+                "description": "Separation type, default is '11' (Demucs3 Model B).",
+                "default": "11",
+                "example": "9"
+              },
+              "add_opt1": {
+                "type": "string",
+                "description": "Additional option 1 for separation.",
+                "example": "0"
+              },
+              "add_opt2": {
+                "type": "string",
+                "description": "Additional option 2 for separation.",
+                "example": "1"
+              },
+              "output_format": {
+                "type": "string",
+                "description": "Output format, default is '0' (mp3).",
+                "default": "0",
+                "example": "1"
+              },
+              "is_demo": {
+                "type": "string",
+                "description": "Boolean to indicate if the separation is for demonstration purposes.",
+                "default": "false",
+                "example": "true"
+              },
+              "responseKey": {
+                "type": "string",
+                "description": "The key for the response structure.",
+                "default": "mvsepResult",
+                "example": "mvsepResult"
+              }
+            },
+            "required": ["audio_url"]
+          },        
       "MusifyConvertVoiceParameters": {
         "type": "object",
         "description": "Parameters for the Convert Voice API integration.",
@@ -109,6 +162,11 @@ const swaggerOptions = {
               "type": "string",
               "description": "The URL of the YouTube video to download.",
               "example": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            },
+            "rapidapi_key":{
+              "type": "string",
+              "description": "Api key for rapidapi.",
+              "example": "abc"
             },
             "responseKey": {
               "type": "string",

@@ -60,7 +60,8 @@ module.exports = {
 
             const promptConteudo = this.replacePlaceholders(
               prompt.prompt,
-              substituicoes
+              substituicoes,
+              prompt.ignorePlaceholders
             );
             const parametrosModeloAtualizados = this.replacePlaceholdersInJson(
               prompt.parametros_modelo,
@@ -148,7 +149,8 @@ module.exports = {
 
           const promptConteudo = this.replacePlaceholders(
             prompt.prompt,
-            substituicoes
+            substituicoes,
+            prompt.ignorePlaceholders
           );
           const parametrosModeloAtualizados = this.replacePlaceholdersInJson(
             prompt.parametros_modelo,
@@ -230,11 +232,16 @@ module.exports = {
     return substituicoes;
   },
 
-  replacePlaceholders(content, substituicoes) {
+  replacePlaceholders(content, substituicoes, ignorePlaceholders = []) {
   if (!content) return null;
 
   // Função recursiva para resolver placeholders aninhados
   const resolvePlaceholder = (placeholder) => {
+    // Verifica se o placeholder deve ser ignorado
+    if (ignorePlaceholders && ignorePlaceholders.includes(placeholder)) {
+      return `{{${placeholder}}}`; // Mantém o placeholder intacto
+    }
+
     // Verifica se é uma chamada de função (e.g., `now('DD-MM-YYYY HH:mm:ss')`)
     const functionMatch = placeholder.match(/^(\w+)\((.*)\)$/);
     if (functionMatch) {
@@ -272,23 +279,29 @@ module.exports = {
   });
 },
 
-  replacePlaceholdersInJson(json, substituicoes) {
-    if (Array.isArray(json)) {
-      return json.map((item) =>
-        this.replacePlaceholdersInJson(item, substituicoes)
-      );
-    } else if (typeof json === "object" && json !== null) {
-      const updatedJson = {};
-      for (const [key, value] of Object.entries(json)) {
-        updatedJson[key] = this.replacePlaceholdersInJson(value, substituicoes);
-      }
-      return updatedJson;
-    } else if (typeof json === "string") {
-      return this.replacePlaceholders(json, substituicoes);
-    } else {
-      return json;
+replacePlaceholdersInJson(json, substituicoes, ignorePlaceholders = []) {
+  if (Array.isArray(json)) {
+    return json.map((item) =>
+      this.replacePlaceholdersInJson(item, substituicoes, ignorePlaceholders)
+    );
+  } else if (typeof json === "object" && json !== null) {
+    const updatedJson = {};
+    // Verifica se existe um atributo ignorePlaceholders no mesmo nível
+    const currentIgnorePlaceholders = json.ignorePlaceholders
+      ? json.ignorePlaceholders.split(";").map((item) => item.trim())
+      : ignorePlaceholders;
+
+    for (const [key, value] of Object.entries(json)) {
+      if (key === "ignorePlaceholders") continue; // Ignora o próprio atributo ignorePlaceholders
+      updatedJson[key] = this.replacePlaceholdersInJson(value, substituicoes, currentIgnorePlaceholders);
     }
-  },
+    return updatedJson;
+  } else if (typeof json === "string") {
+    return this.replacePlaceholders(json, substituicoes, ignorePlaceholders);
+  } else {
+    return json;
+  }
+},
 
   executeFunctionPlaceholder(functionName, args) {
     const functionMap = {

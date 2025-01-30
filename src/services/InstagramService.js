@@ -6,14 +6,14 @@ class InstagramService {
   }
 
  
-  async publishPost(mediaUrl, caption, apiKey) {
+  async publishPost(mediaUrl, mediaType, caption, apiKey) {
     if (!mediaUrl) {
       throw new Error('O campo media_url é obrigatório');
     }
 
     const response = await axios.post(
       `${this.apiBaseUrl}/post`,
-      { media_url: mediaUrl, caption: caption },
+      { media_url: mediaUrl, media_type: mediaType,caption: caption },
       { headers: { api_key: `${apiKey}` } }
     );
 

@@ -72,7 +72,7 @@ const FfmpegCommandIntegration = require("../engines/FfmpegCommandIntegration");
 const YoutubeDownloadIntegration = require("../engines/YoutubeDownloadIntegration");
 const AudioIsolationIntegration = require('../engines/AudioIsolationIntegration');
 const MusifyConvertVoicesIntegration = require('../engines/MusifyConvertVoicesIntegration');
-
+const MVSEPIntegration = require('../engines/MVSEPIntegration');
 
 
 module.exports = {
@@ -211,6 +211,9 @@ module.exports = {
           break;    
         case 'mp3-to-mp4':
           integrationClass = Mp3ToMp4Integration;
+          break;    
+        case 'mvsep':
+          integrationClass = MVSEPIntegration;
           break;    
         case 'openai':
           integrationClass = OpenAIIntegration;

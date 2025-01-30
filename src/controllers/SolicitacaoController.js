@@ -49,6 +49,15 @@ module.exports = {
  *                       properties:
  *                         engine:
  *                           type: string
+ *                           enum: ["mvsep"]
+ *                           description: Engine for the MVSEP API integration
+ *                         model_parameters:
+ *                           $ref: '#/components/schemas/MVSEPParameters'
+ *                       required: [engine, model_parameters] 
+ *                     - type: object
+ *                       properties:
+ *                         engine:
+ *                           type: string
  *                           enum: ["musify-convert-voices"]
  *                           description: Engine for the Convert Voice API integration
  *                         model_parameters:
@@ -957,7 +966,8 @@ module.exports = {
           prompt.engine,
           prompt.model,
           index + 1,
-          prompt.model_parameters
+          prompt.model_parameters, 
+          prompt.ignorePlaceholders
         );
 
         if (prompt.prompt_parameters && Array.isArray(prompt.prompt_parameters)) {
